@@ -1,0 +1,20 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:colek="https://github.com/RobbedColek/ColekUI"
+             x:Class="PKGMerge.App"
+             RequestedThemeVariant="Dark">
+    <Application.DataTemplates>
+        <colek:CachingViewLocator />
+    </Application.DataTemplates>
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://PKGMerge/Resources/Icons.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://ColekUI/Theme/ColekTheme.axaml" />
+    </Application.Styles>
+</Application>

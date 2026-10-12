@@ -1,0 +1,91 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version stamped into the application, e.g. 1.2.3 or 0.0.0-nightly'
+        required: true
+        type: string
+      asset-label:
+        description: 'Optional label inserted into asset names, e.g. v1.2.3 gives PKGMerge-v1.2.3-<rid>.<ext>'
+        required: false
+        type: string
+        default: ''
+
+env:
+  APP_PROJECT: src/PKGMerge/PKGMerge.csproj
+  CLI_PROJECT: src/PKGMerge.Cli/PKGMerge.Cli.csproj
+  APP_NAME: PKGMerge
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: macos-latest
+            rid: osx-arm64
+          - os: macos-latest
+            rid: osx-x64
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.112'
+
+      # Native AOT (CLI) links with clang and zlib on Linux.
+      - name: Install Native AOT prerequisites
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
+
+      # Native AOT (CLI) finds the linker through vcvarsall.bat, which calls vswhere.exe from the PATH.
+      - name: Put vswhere on the PATH
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Add-Content $env:GITHUB_PATH "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer"
+
+      # Single file, self-contained and ReadyToRun (app) and Native AOT (CLI) are configured in the projects.
+      - name: Publish
+        shell: bash
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          args=(-c Release -r "${{ matrix.rid }}" -p:DebugType=none -p:Version="$VERSION")
+          dotnet publish "$APP_PROJECT" "${args[@]}" -o publish/app
+          dotnet publish "$CLI_PROJECT" "${args[@]}" -o publish/cli
+
+      - name: Package
+        shell: bash
+        env:
+          ASSET_LABEL: ${{ inputs.asset-label }}
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then ext=".exe"; else ext=""; fi
+          for program in app:${APP_NAME} cli:${APP_NAME}Cli; do
+            dir="${program%%:*}"
+            exe="${program#*:}"
+            name="${exe}${ASSET_LABEL:+-$ASSET_LABEL}-${{ matrix.rid }}"
+            mkdir "package-${dir}"
+            cp "publish/${dir}/${exe}${ext}" LICENSE README.md "package-${dir}/"
+            if [ "$RUNNER_OS" == "Windows" ]; then
+              7z a "${name}.zip" "./package-${dir}/*"
+            else
+              tar -czf "${name}.tar.gz" -C "package-${dir}" .
+            fi
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-${{ matrix.rid }}
+          path: ${{ env.APP_NAME }}*-${{ matrix.rid }}.*
+          retention-days: 1
+          if-no-files-found: error

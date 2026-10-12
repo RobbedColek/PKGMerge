@@ -1,0 +1,59 @@
+name: Nightly Build
+
+on:
+  schedule:
+    - cron: '17 2 * * *'
+      timezone: 'Europe/Warsaw'
+  workflow_dispatch:
+
+concurrency:
+  group: nightly
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.c.outputs.changed }}
+    steps:
+      - id: c
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          last=$(gh api "repos/${{ github.repository }}/commits/nightly" --jq .sha 2>/dev/null) || last=none
+          if [ "$last" = "${{ github.sha }}" ] && [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    needs: check
+    if: needs.check.outputs.changed == 'true'
+    uses: ./.github/workflows/build.yml
+    with:
+      version: 0.0.0-nightly
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Replace nightly release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh release delete nightly --cleanup-tag --yes --repo "$REPO" || true
+          gh release create nightly dist/* \
+            --repo "$REPO" \
+            --target "${{ github.sha }}" \
+            --prerelease \
+            --title "Nightly build" \
+            --notes "Automated build from commit ${{ github.sha }}"

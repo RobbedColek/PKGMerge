@@ -1,0 +1,332 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:colek="https://github.com/RobbedColek/ColekUI"
+             xmlns:vm="clr-namespace:PKGMerge.ViewModels.Merge"
+             xmlns:models="clr-namespace:PKGMerge.Models"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             mc:Ignorable="d"
+             d:DesignWidth="900"
+             d:DesignHeight="640"
+             x:Class="PKGMerge.Views.Merge.MergeView"
+             x:DataType="vm:MergeViewModel"
+             DragDrop.AllowDrop="True">
+
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="Merge.SuccessBrush" Color="#FF3FB950" />
+        <SolidColorBrush x:Key="Merge.SuccessBackgroundBrush" Color="#1F3FB950" />
+        <SolidColorBrush x:Key="Merge.SuccessBorderBrush" Color="#663FB950" />
+        <SolidColorBrush x:Key="Merge.WarningBrush" Color="#FFE3B341" />
+        <SolidColorBrush x:Key="Merge.WarningBackgroundBrush" Color="#1FE3B341" />
+        <SolidColorBrush x:Key="Merge.WarningBorderBrush" Color="#66E3B341" />
+        <SolidColorBrush x:Key="Merge.ErrorBackgroundBrush" Color="#1FFF6B6B" />
+        <SolidColorBrush x:Key="Merge.ErrorBorderBrush" Color="#66FF6B6B" />
+        <SolidColorBrush x:Key="Merge.MessageBackgroundBrush" Color="#FF161616" />
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{DynamicResource ColekUI.SurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ColekUI.BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="12" />
+        </Style>
+        <Style Selector="Border.card.dropTarget">
+            <Setter Property="BorderBrush" Value="{DynamicResource ColekUI.AccentBrush}" />
+        </Style>
+        <Style Selector="TextBlock.fieldLabel">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Margin" Value="0,0,0,4" />
+        </Style>
+        <Style Selector="TextBlock.fieldLabel:disabled, TextBlock.description:disabled">
+            <Setter Property="Opacity" Value="0.4" />
+        </Style>
+        <Style Selector="TextBlock.description">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{DynamicResource ColekUI.CaptionTextBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style Selector="TextBlock.packageDetail">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="{DynamicResource ColekUI.SecondaryTextBrush}" />
+        </Style>
+        <Style Selector="TextBlock.statLabel">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{DynamicResource ColekUI.CaptionTextBrush}" />
+        </Style>
+        <Style Selector="TextBlock.statValue">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontFeatures" Value="+tnum" />
+        </Style>
+        <Style Selector="Grid.pathRow > TextBox">
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Grid.pathRow > Button">
+            <Setter Property="MinWidth" Value="80" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.action">
+            <Setter Property="MinWidth" Value="120" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="ProgressBar.merge">
+            <Setter Property="Height" Value="8" />
+            <Setter Property="MinHeight" Value="8" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Background" Value="{DynamicResource ColekUI.BorderBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource ColekUI.AccentBrush}" />
+        </Style>
+        <Style Selector="ProgressBar.merge.done">
+            <Setter Property="Foreground" Value="{StaticResource Merge.SuccessBrush}" />
+        </Style>
+
+        <!-- Status messages -->
+        <Style Selector="Border.message">
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="Background" Value="{StaticResource Merge.MessageBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ColekUI.BorderBrush}" />
+        </Style>
+        <Style Selector="Border.message colek|Codicon">
+            <Setter Property="Foreground" Value="{DynamicResource ColekUI.SecondaryTextBrush}" />
+        </Style>
+        <Style Selector="Border.message.error">
+            <Setter Property="Background" Value="{StaticResource Merge.ErrorBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Merge.ErrorBorderBrush}" />
+        </Style>
+        <Style Selector="Border.message.error colek|Codicon">
+            <Setter Property="Foreground" Value="{DynamicResource ColekUI.ErrorTextBrush}" />
+        </Style>
+        <Style Selector="Border.message.warning">
+            <Setter Property="Background" Value="{StaticResource Merge.WarningBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Merge.WarningBorderBrush}" />
+        </Style>
+        <Style Selector="Border.message.warning colek|Codicon">
+            <Setter Property="Foreground" Value="{StaticResource Merge.WarningBrush}" />
+        </Style>
+        <Style Selector="Border.message.success">
+            <Setter Property="Background" Value="{StaticResource Merge.SuccessBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Merge.SuccessBorderBrush}" />
+        </Style>
+        <Style Selector="Border.message.success colek|Codicon">
+            <Setter Property="Foreground" Value="{StaticResource Merge.SuccessBrush}" />
+        </Style>
+
+        <!-- About -->
+        <Style Selector="TextBlock.about">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Foreground" Value="{DynamicResource ColekUI.CaptionTextBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style Selector="HyperlinkButton.about">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Foreground" Value="#FF64B5F6" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="*,Auto"
+          RowSpacing="10"
+          Background="Transparent">
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="10">
+
+                <!-- PKG -->
+                <Border Classes="card">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                        <Border Grid.Column="0"
+                                Width="96"
+                                Height="96"
+                                CornerRadius="8"
+                                ClipToBounds="True"
+                                Background="{DynamicResource ColekUI.BorderBrush}">
+                            <Panel>
+                                <colek:Codicon Data="{StaticResource Codicon.Package}"
+                                               Width="48"
+                                               Height="48"
+                                               Stretch="Uniform"
+                                               Foreground="{DynamicResource ColekUI.CaptionTextBrush}"
+                                               IsVisible="{Binding Icon, Converter={x:Static ObjectConverters.IsNull}}" />
+                                <Image Source="{Binding Icon}"
+                                       Stretch="UniformToFill"
+                                       RenderOptions.BitmapInterpolationMode="HighQuality" />
+                            </Panel>
+                        </Border>
+                        <StackPanel Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Spacing="2">
+                            <TextBlock Text="{Binding PackageTitle}"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="White"
+                                       TextWrapping="Wrap" />
+                            <StackPanel Spacing="2" IsVisible="{Binding HasPackage}">
+                                <TextBlock Classes="packageDetail" Text="{Binding PackagePlatform}" />
+                                <TextBlock Classes="packageDetail" Text="{Binding PackagePieces}" />
+                                <TextBlock Classes="packageDetail" Text="{Binding PackageSize}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Files -->
+                <Border x:Name="FilesCard"
+                        Classes="card">
+                    <StackPanel Spacing="10">
+                        <StackPanel>
+                            <TextBlock Classes="fieldLabel" Text="Source PKG" />
+                            <Grid Classes="pathRow" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <TextBox Grid.Column="0"
+                                         Text="{Binding SourcePath, UpdateSourceTrigger=LostFocus}"
+                                         IsReadOnly="{Binding IsRunning}" />
+                                <Button Grid.Column="1" Content="Browse…" Command="{Binding BrowseSourceCommand}" />
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel IsEnabled="{Binding IsPs5}">
+                            <TextBlock Classes="fieldLabel" Text="*_sc.pkg" />
+                            <Grid Classes="pathRow" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <TextBox Grid.Column="0"
+                                         Text="{Binding ScPath, UpdateSourceTrigger=LostFocus}"
+                                         PlaceholderText="{Binding ScPlaceholder}"
+                                         IsReadOnly="{Binding IsRunning}" />
+                                <Button Grid.Column="1" Content="Browse…" Command="{Binding BrowseScCommand}" />
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel IsEnabled="{Binding IsOutputEnabled}">
+                            <TextBlock Classes="fieldLabel" Text="Merged PKG" />
+                            <Grid Classes="pathRow" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <TextBox Grid.Column="0"
+                                         Text="{Binding OutputPath}"
+                                         IsReadOnly="{Binding IsRunning}" />
+                                <Button Grid.Column="1" Content="Browse…" Command="{Binding BrowseOutputCommand}" />
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel>
+                            <CheckBox Content="Delete pieces while merging"
+                                      IsChecked="{Binding MergeInPlace}"
+                                      IsEnabled="{Binding !IsRunning}" />
+                            <TextBlock Classes="description"
+                                       Text="Needs free space for only about one piece instead of the whole package.&#10;The output stays in the source folder." />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Classes="fieldLabel"
+                                       Margin="0"
+                                       VerticalAlignment="Center"
+                                       Text="Buffer size" />
+                            <ComboBox ItemsSource="{Binding BufferSizes}"
+                                      SelectedItem="{Binding BufferSizeMiB}"
+                                      IsEnabled="{Binding !IsRunning}"
+                                      MinWidth="110">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="sys:Int32">
+                                        <TextBlock Text="{Binding StringFormat={}{0} MiB}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Progress -->
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0"
+                                       Classes="description"
+                                       Text="{Binding PartText}" />
+                            <TextBlock Grid.Column="1"
+                                       Classes="description"
+                                       FontFeatures="+tnum"
+                                       Text="{Binding ProgressPercent, StringFormat={}{0:0}%}" />
+                        </Grid>
+                        <ProgressBar Classes="merge"
+                                     Classes.done="{Binding IsCompleted}"
+                                     Minimum="0"
+                                     Maximum="100"
+                                     Value="{Binding ProgressPercent}" />
+                        <Grid ColumnDefinitions="3*,2*,2*" ColumnSpacing="16">
+                            <StackPanel Grid.Column="0" Spacing="2">
+                                <TextBlock Classes="statLabel" Text="Processed" />
+                                <TextBlock Classes="statValue" Text="{Binding ProcessedText}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock Classes="statLabel" Text="{Binding SpeedLabel}" />
+                                <TextBlock Classes="statValue" Text="{Binding SpeedText}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="2">
+                                <TextBlock Classes="statLabel" Text="{Binding EtaLabel}" />
+                                <TextBlock Classes="statValue" Text="{Binding EtaText}" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Messages -->
+                <ItemsControl ItemsSource="{Binding Messages}"
+                              IsVisible="{Binding HasMessages}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Spacing="8" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="models:StatusMessage">
+                            <Border Classes="message"
+                                    Classes.error="{Binding IsError}"
+                                    Classes.warning="{Binding IsWarning}"
+                                    Classes.success="{Binding IsSuccess}">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                    <Panel Grid.Column="0" Width="16" Height="16" VerticalAlignment="Top" Margin="0,1,0,0">
+                                        <colek:Codicon Data="{StaticResource Codicon.Error}" IsVisible="{Binding IsError}" />
+                                        <colek:Codicon Data="{StaticResource Codicon.Warning}" IsVisible="{Binding IsWarning}" />
+                                        <colek:Codicon Data="{StaticResource Codicon.Pass}" IsVisible="{Binding IsSuccess}" />
+                                        <colek:Codicon Data="{StaticResource Codicon.Info}" IsVisible="{Binding IsInfo}" />
+                                    </Panel>
+                                    <SelectableTextBlock Grid.Column="1"
+                                                         Text="{Binding Text}"
+                                                         Foreground="White"
+                                                         TextWrapping="Wrap" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="16">
+            <StackPanel Grid.Column="0"
+                        Margin="2,0,0,0"
+                        VerticalAlignment="Center">
+                <TextBlock Classes="about" Text="{Binding Version, StringFormat='Created by Colek · Version: {0}'}" />
+                <HyperlinkButton Classes="about"
+                                 Content="https://github.com/RobbedColek/PKGMerge"
+                                 NavigateUri="https://github.com/RobbedColek/PKGMerge" />
+            </StackPanel>
+
+            <Panel Grid.Column="1" VerticalAlignment="Center">
+                <Button Classes="accent action"
+                        Content="Start"
+                        Command="{Binding StartCommand}"
+                        IsVisible="{Binding !IsRunning}" />
+                <Button Classes="action"
+                        Content="Cancel"
+                        Command="{Binding StartCancelCommand}"
+                        IsVisible="{Binding IsRunning}" />
+            </Panel>
+        </Grid>
+    </Grid>
+</UserControl>

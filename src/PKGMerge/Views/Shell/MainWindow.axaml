@@ -1,0 +1,20 @@
+<colek:ColekWindow xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:colek="https://github.com/RobbedColek/ColekUI"
+
+                   mc:Ignorable="d"
+                   d:DesignWidth="900"
+                   d:DesignHeight="640"
+
+                   x:Class="PKGMerge.Views.Shell.MainWindow"
+                   Title="PKGMerge"
+                   Icon="/app.ico"
+                   Width="600"
+                   MinWidth="0"
+                   MinHeight="0"
+                   SizeToContent="Height"
+                   CanResize="False"
+                   WindowStartupLocation="CenterScreen"
+                   PlacementIncludesSize="False" />

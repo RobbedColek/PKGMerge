@@ -1,0 +1,6 @@
+<Solution>
+    <Project Path="external\ColekUI\src\ColekUI\ColekUI.csproj"/>
+    <Project Path="src\PKGMerge.Core\PKGMerge.Core.csproj"/>
+    <Project Path="src\PKGMerge.Cli\PKGMerge.Cli.csproj"/>
+    <Project Path="src\PKGMerge\PKGMerge.csproj"/>
+</Solution>
